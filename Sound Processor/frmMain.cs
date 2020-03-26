@@ -37,79 +37,92 @@ namespace Sound_Processor
         {
             nodeEditor.propertyGrid.SelectedObject = obj;
 
-            dynamic context = obj;
-            try
+            NodesGraph graph = nodeEditor.nodesControl.graph;
+            if (graph.Nodes.Exists(x => x.IsSelected))
             {
-                Samples samples = context.samplesOut;
-
-                Series series = new Series();
-                float yMin = 0;
-                float yMax = 0;
-                for (int i = 0; i < samples.Data.Length; i++)
+                foreach (NodeVisual n in graph.Nodes.Where(x => x.IsSelected))
                 {
-                    series.Points.AddXY(i / 44100f, samples.Data[i]);
+                    if (n.Name != "Process")
+                        nodeEditor.nodesControl.Execute(n);
 
-                    if (samples.Data[i] > yMax)
-                        yMax = samples.Data[i];
-                    if (samples.Data[i] < yMin)
-                        yMin = samples.Data[i];
-                }
+                    //dynamic context = obj;
+                    dynamic context = n.GetNodeContext();
+                    try
+                    {
+                        Samples samples = context.samplesOut;
 
-                series.ChartType = SeriesChartType.Line;
-                chart.Series.Clear();
-                chart.ChartAreas[0].AxisY.IsStartedFromZero = false;
-                chart.Series.Add(series);
+                        Series series = new Series();
+                        float yMin = 0;
+                        float yMax = 0;
+                        for (int i = 0; i < samples.Data.Length; i++)
+                        {
+                            series.Points.AddXY(i / 44100f, samples.Data[i]);
 
-                if (yMax != yMin)
-                {
-                    chart.ChartAreas[0].AxisY.Maximum = yMax;
-                    chart.ChartAreas[0].AxisY.Minimum = yMin;
-                }
-                else
-                {
-                    chart.ChartAreas[0].AxisY.Maximum = yMax + 1;
-                    chart.ChartAreas[0].AxisY.Minimum = yMin - 1;
+                            if (samples.Data[i] > yMax)
+                                yMax = samples.Data[i];
+                            if (samples.Data[i] < yMin)
+                                yMin = samples.Data[i];
+                        }
+
+                        series.ChartType = SeriesChartType.Line;
+                        chart.Series.Clear();
+                        chart.ChartAreas[0].AxisY.IsStartedFromZero = false;
+                        chart.Series.Add(series);
+
+                        if (yMax != yMin)
+                        {
+                            chart.ChartAreas[0].AxisY.Maximum = yMax;
+                            chart.ChartAreas[0].AxisY.Minimum = yMin;
+                        }
+                        else
+                        {
+                            chart.ChartAreas[0].AxisY.Maximum = yMax + 1;
+                            chart.ChartAreas[0].AxisY.Minimum = yMin - 1;
+                        }
+                    }
+                    catch
+                    {
+                    }
+                    try
+                    {
+                        Signal signal = context.signal;
+
+                        Series series = new Series();
+                        float yMin = 0;
+                        float yMax = 0;
+                        for (int i = 0; i < signal.Length; i++)
+                        {
+                            series.Points.AddXY(i / 44100f, signal[i]);
+
+                            if (signal[i] > yMax)
+                                yMax = signal[i];
+                            if (signal[i] < yMin)
+                                yMin = signal[i];
+                        }
+
+                        series.ChartType = SeriesChartType.Line;
+                        chart.Series.Clear();
+                        chart.ChartAreas[0].AxisY.IsStartedFromZero = false;
+                        chart.Series.Add(series);
+
+                        if (yMax != yMin)
+                        {
+                            chart.ChartAreas[0].AxisY.Maximum = yMax;
+                            chart.ChartAreas[0].AxisY.Minimum = yMin;
+                        }
+                        else
+                        {
+                            chart.ChartAreas[0].AxisY.Maximum = yMax + 1;
+                            chart.ChartAreas[0].AxisY.Minimum = yMin - 1;
+                        }
+                    }
+                    catch
+                    {
+                    }
                 }
             }
-            catch
-            {
-            }
-            try
-            {
-                Signal signal = context.signal;
 
-                Series series = new Series();
-                float yMin = 0;
-                float yMax = 0;
-                for (int i = 0; i < signal.Length; i++)
-                {
-                    series.Points.AddXY(i / 44100f, signal[i]);
-
-                    if (signal[i] > yMax)
-                        yMax = signal[i];
-                    if (signal[i] < yMin)
-                        yMin = signal[i];
-                }
-
-                series.ChartType = SeriesChartType.Line;
-                chart.Series.Clear();
-                chart.ChartAreas[0].AxisY.IsStartedFromZero = false;
-                chart.Series.Add(series);
-
-                if (yMax != yMin)
-                {
-                    chart.ChartAreas[0].AxisY.Maximum = yMax;
-                    chart.ChartAreas[0].AxisY.Minimum = yMin;
-                }
-                else
-                {
-                    chart.ChartAreas[0].AxisY.Maximum = yMax + 1;
-                    chart.ChartAreas[0].AxisY.Minimum = yMin - 1;
-                }
-            }
-            catch
-            {
-            }
+            
         }
 
         private void nodeEditor_Load(object sender, EventArgs e)

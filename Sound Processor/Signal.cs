@@ -55,10 +55,7 @@ namespace Sound_Processor
 
         public Signal(int length)
         {
-            if (length > 0)
-                values = new float[length];
-            else
-                throw new ArgumentOutOfRangeException("Length must be greater than zero.");
+            values = new float[length];
         }
 
         public Signal(float[] values)

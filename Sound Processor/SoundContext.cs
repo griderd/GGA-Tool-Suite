@@ -22,8 +22,6 @@ namespace Sound_Processor
             
         }
 
-
-
         public NodeVisual CurrentProcessingNode { get; set; }
         public event Action<string, NodeVisual, FeedbackType, object, bool> FeedbackInfo;
 
@@ -143,6 +141,12 @@ namespace Sound_Processor
         [Node("Process", "Output", "General", "Processes the sound.", true, true)]
         public void Process(Signal signal, out Samples samplesOut, short scale = short.MaxValue, bool play = true, bool export = true, string path = "MySound.wav")
         {
+            if (signal == null)
+            {
+                samplesOut = new Samples();
+                return;
+            }
+
             samplesOut = signal.ToSamples(scale);
             WaveFile wave = new WaveFile(1, SAMPLE_RATE, 16, samplesOut.Binary);
 
@@ -277,6 +281,12 @@ namespace Sound_Processor
         [Node("Additive Mixer", "Mixers", "General", "Performs additive mixing of signals.", false)]
         public void AdditiveMixer(Signal a, Signal b, out Signal signal)
         {
+            if ((a.Length == 0) | (b.Length == 0))
+            {
+                signal = new Signal(0);
+                return;
+            }
+
             int length = a.Length > b.Length ? a.Length : b.Length;
 
             Signal result = new Signal(length);
@@ -298,6 +308,12 @@ namespace Sound_Processor
         [Node("Multiply Mixer", "Mixers", "General", "Performs multiply mixing of signals.", false)]
         public void MultiplyMixer(Signal a, Signal b, out Signal signal)
         {
+            if ((a.Length == 0) | (b.Length == 0))
+            {
+                signal = new Signal(0);
+                return;
+            }
+
             int length = a.Length > b.Length ? a.Length : b.Length;
 
             Signal result = new Signal(length);
@@ -319,6 +335,12 @@ namespace Sound_Processor
         [Node("Subtractive Mixer", "Mixers", "General", "Performs subtractive mixing of signals.", false)]
         public void SubtractiveMixer(Signal a, Signal b, out Signal signal)
         {
+            if ((a.Length == 0) | (b.Length == 0))
+            {
+                signal = new Signal(0);
+                return;
+            }
+
             int length = a.Length > b.Length ? a.Length : b.Length;
 
             Signal result = new Signal(length);
@@ -340,6 +362,12 @@ namespace Sound_Processor
         [Node("Division Mixer", "Mixers", "General", "Performs division mixing of signals.", false)]
         public void DivisionMixer(Signal a, Signal b, out Signal signal)
         {
+            if ((a.Length == 0) | (b.Length == 0))
+            {
+                signal = new Signal(0);
+                return;
+            }
+
             int length = a.Length > b.Length ? a.Length : b.Length;
 
             Signal result = new Signal(length);
@@ -361,6 +389,12 @@ namespace Sound_Processor
         [Node("Modulus Mixer", "Mixers", "General", "Performs division mixing of signals.", false)]
         public void ModulusMixer(Signal a, Signal b, out Signal signal)
         {
+            if ((a.Length == 0) | (b.Length == 0))
+            {
+                signal = new Signal(0);
+                return;
+            }
+
             int length = a.Length > b.Length ? a.Length : b.Length;
 
             Signal result = new Signal(length);
@@ -382,6 +416,12 @@ namespace Sound_Processor
         [Node("Screen Mixer", "Mixers", "General", "Performs additive mixing of signals.", false)]
         public void ScreenMixer(Signal a, Signal b, out Signal signal)
         {
+            if ((a.Length == 0) | (b.Length == 0))
+            {
+                signal = new Signal(0);
+                return;
+            }
+
             int length = a.Length > b.Length ? a.Length : b.Length;
 
             Signal result = new Signal(length);
@@ -404,6 +444,12 @@ namespace Sound_Processor
         [Node("Overlay Mixer", "Mixers", "General", "Performs additive mixing of signals.", false)]
         public void OverlayMixer(Signal a, Signal b, out Signal signal)
         {
+            if ((a.Length == 0) | (b.Length == 0))
+            {
+                signal = new Signal(0);
+                return;
+            }
+
             int length = a.Length > b.Length ? a.Length : b.Length;
 
             Signal result = new Signal(length);
@@ -433,6 +479,12 @@ namespace Sound_Processor
         [Node("File In", "Inputs", "General", "An existing wave file.", false)]
         public void FileIn(string path, out Signal signal)
         {
+            if (path == "")
+            {
+                signal = new Signal(0);
+                return;
+            }
+
             try
             {
                 WaveFile file = new WaveFile(path);
@@ -456,6 +508,12 @@ namespace Sound_Processor
         [Node("Invert", "Filters", "General", "Inverts a signal.", false)]
         public void Invert(Signal signalIn, out Signal signal)
         {
+            if (signalIn.Length == 0)
+            {
+                signal = new Signal(0);
+                return;
+            }
+
             signal = new Signal(signalIn.Length);
 
             for (int i = 0; i < signalIn.Length; i++)
@@ -467,6 +525,12 @@ namespace Sound_Processor
         [Node("Volume Multiplier", "Filters", "General", "Changes the volume of the signal.", false)]
         public void Volume(Signal signalIn, out Signal signal, float volume = 0.5f)
         {
+            if (signalIn.Length == 0)
+            {
+                signal = new Signal(0);
+                return;
+            }
+
             signal = new Signal(signalIn.Length);
 
             for (int i = 0; i < signalIn.Length; i++)
@@ -478,6 +542,12 @@ namespace Sound_Processor
         [Node("Time Shift", "Filters", "General", "Changes the start position of the signal.", false)]
         public void TimeShift(Signal signalIn, float shift, out Signal signal)
         {
+            if (signalIn.Length == 0)
+            {
+                signal = new Signal(0);
+                return;
+            }
+
             int length = signalIn.Length;
             int offset = (int)(shift * SAMPLE_RATE);
             length = length + offset;
@@ -496,6 +566,12 @@ namespace Sound_Processor
         [Node("Amplitude Highpass", "Filters", "General", "Allows signal values above a certain amount to pass, sets the rest to floor.", false)]
         public void AmplitudeHighpass(Signal signalIn, float cutoff, float floor, out Signal signal)
         {
+            if (signalIn.Length == 0)
+            {
+                signal = new Signal(0);
+                return;
+            }
+
             signal = new Signal(signalIn.Length);
 
             for (int i = 0; i < signalIn.Length; i++)
@@ -510,6 +586,12 @@ namespace Sound_Processor
         [Node("Amplitude Lowpass", "Filters", "General", "Allows signal values below a certain amount to pass, sets the rest to floor.", false)]
         public void AmplitudeLowpass(Signal signalIn, float cutoff, float floor, out Signal signal)
         {
+            if (signalIn.Length == 0)
+            {
+                signal = new Signal(0);
+                return;
+            }
+
             signal = new Signal(signalIn.Length);
 
             for (int i = 0; i < signalIn.Length; i++)
@@ -527,6 +609,12 @@ namespace Sound_Processor
         [Node("FFT", "FFT", "General", "FFT", false)]
         public void FFT(Signal signalIn, out Signal signal)
         {
+            if (signalIn.Length == 0)
+            {
+                signal = new Signal(0);
+                return;
+            }
+
             float[] values = new float[signalIn.Length + 2];
             Buffer.BlockCopy(signalIn.Values, 0, values, 0, signalIn.Length);
             Fourier.ForwardReal(values, signalIn.Length);
@@ -537,6 +625,12 @@ namespace Sound_Processor
         [Node("Reverse FFT", "FFT", "General", "FFT", false)]
         public void ReverseFFT(Signal signalIn, out Signal signal)
         {
+            if (signalIn.Length == 0)
+            {
+                signal = new Signal(0);
+                return;
+            }
+
             float[] values = new float[signalIn.Length + 2];
             Buffer.BlockCopy(signalIn.Values, 0, values, 0, signalIn.Length);
             Fourier.InverseReal(values, signalIn.Length);
